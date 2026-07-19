@@ -1,0 +1,24 @@
+# Binaries
+/eigenbeleg
+/cmd/eigenbeleg/eigenbeleg
+
+# Test binaries
+*.test
+
+# Output of `go build -o`
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test output
+*.pdf
+
+# Go coverage
+*.out
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
