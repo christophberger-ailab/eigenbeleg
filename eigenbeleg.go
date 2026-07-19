@@ -23,7 +23,9 @@ type Receipt struct {
 	// ("Einnahme"), a negative amount an expense ("Ausgabe"). The PDF
 	// always shows the absolute value.
 	Amount float64
-	// Subject describes the transaction ("Vorgang").
+	// Subject describes the transaction ("Vorgang"). If empty, it
+	// defaults to "Privatentnahme" for negative amounts and
+	// "Privateinlage" for positive amounts.
 	Subject string
 	// Recipient is the receiver of the payment ("Empfänger").
 	Recipient string
@@ -123,8 +125,8 @@ func Generate(r Receipt) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// validate checks mandatory fields and applies the defaults for Type and
-// Date. It modifies r in place.
+// validate checks mandatory fields and applies the defaults for Subject,
+// Type, and Date. It modifies r in place.
 func validate(r *Receipt) error {
 	if r.SignaturePath == "" {
 		return fmt.Errorf("signature image is mandatory")
@@ -143,6 +145,13 @@ func validate(r *Receipt) error {
 		}
 		if _, err := os.Stat(img.path); err != nil {
 			return fmt.Errorf("%s image: %w", img.name, err)
+		}
+	}
+	if r.Subject == "" {
+		if r.Amount < 0 {
+			r.Subject = "Privatentnahme"
+		} else {
+			r.Subject = "Privateinlage"
 		}
 	}
 	if r.Type == "" {

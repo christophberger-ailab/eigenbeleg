@@ -39,7 +39,7 @@ func TestParseAmount(t *testing.T) {
 
 func TestParseDate(t *testing.T) {
 	t.Run("valid date", func(t *testing.T) {
-		got, err := parseDate("01.07.2026")
+		got, err := parseDate("2026-07-01")
 		if err != nil {
 			t.Fatalf("parseDate() unexpected error: %v", err)
 		}
@@ -60,9 +60,27 @@ func TestParseDate(t *testing.T) {
 	})
 
 	t.Run("wrong format returns error", func(t *testing.T) {
-		_, err := parseDate("2026-07-01")
+		_, err := parseDate("01.07.2026")
 		if err == nil {
-			t.Fatal("parseDate(\"2026-07-01\") expected error, got nil")
+			t.Fatal("parseDate(\"01.07.2026\") expected error, got nil")
+		}
+	})
+}
+
+func TestDefaultOutputPath(t *testing.T) {
+	t.Run("with date", func(t *testing.T) {
+		got := defaultOutputPath(time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC), "42")
+		want := "2026-07-01 Eigenbeleg 42.pdf"
+		if got != want {
+			t.Errorf("defaultOutputPath() = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("zero date falls back to today", func(t *testing.T) {
+		got := defaultOutputPath(time.Time{}, "42")
+		want := time.Now().Format("2006-01-02") + " Eigenbeleg 42.pdf"
+		if got != want {
+			t.Errorf("defaultOutputPath() = %q, want %q", got, want)
 		}
 	})
 }

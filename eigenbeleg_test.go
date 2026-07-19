@@ -161,6 +161,36 @@ func TestValidateTypeDefaulting(t *testing.T) {
 		}
 	})
 
+	t.Run("negative amount defaults subject to Privatentnahme", func(t *testing.T) {
+		r := Receipt{Amount: -10, SignaturePath: sigPath}
+		if err := validate(&r); err != nil {
+			t.Fatalf("validate() error = %v", err)
+		}
+		if r.Subject != "Privatentnahme" {
+			t.Errorf("Subject = %q, want %q", r.Subject, "Privatentnahme")
+		}
+	})
+
+	t.Run("positive amount defaults subject to Privateinlage", func(t *testing.T) {
+		r := Receipt{Amount: 10, SignaturePath: sigPath}
+		if err := validate(&r); err != nil {
+			t.Fatalf("validate() error = %v", err)
+		}
+		if r.Subject != "Privateinlage" {
+			t.Errorf("Subject = %q, want %q", r.Subject, "Privateinlage")
+		}
+	})
+
+	t.Run("explicit subject is preserved", func(t *testing.T) {
+		r := Receipt{Amount: -10, Subject: "Parkgebühren", SignaturePath: sigPath}
+		if err := validate(&r); err != nil {
+			t.Fatalf("validate() error = %v", err)
+		}
+		if r.Subject != "Parkgebühren" {
+			t.Errorf("Subject = %q, want %q", r.Subject, "Parkgebühren")
+		}
+	})
+
 	t.Run("explicit type is preserved", func(t *testing.T) {
 		r := Receipt{Amount: -10, Type: "Sonderfall", SignaturePath: sigPath}
 		if err := validate(&r); err != nil {

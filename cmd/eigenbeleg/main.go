@@ -20,14 +20,14 @@ import (
 var (
 	number    = flag.StringP("number", "n", "", "receipt number (required)")
 	amount    = flag.StringP("amount", "a", "", "amount, e.g. 1.234,56 or -42.50; negative for expenses (required)")
-	subject   = flag.StringP("subject", "s", "", "subject of the transaction (required)")
+	subject   = flag.StringP("subject", "s", "", "subject of the transaction (default: Privatentnahme or Privateinlage)")
 	recipient = flag.StringP("recipient", "r", "", "recipient of the payment (required)")
 	typ       = flag.StringP("type", "t", "", "type of expenditure (default: Privatentnahme or Privateinlage)")
 	reason    = flag.StringP("reason", "g", "", "reason for the Eigenbeleg (required)")
-	date      = flag.StringP("date", "d", "", "date as DD.MM.YYYY (default: today)")
+	date      = flag.StringP("date", "d", "", "date as YYYY-MM-DD (default: today)")
 	signature = flag.StringP("signature", "i", "", "path to signature image, PNG or JPEG (required)")
 	header    = flag.StringP("header", "H", "", "path to header image, PNG or JPEG")
-	output    = flag.StringP("output", "o", "", "path of the PDF file to write (required)")
+	output    = flag.StringP("output", "o", "", "path of the PDF file to write (default: ./<date> Eigenbeleg <number>.pdf)")
 )
 
 func main() {
@@ -47,11 +47,9 @@ func run() error {
 	for _, f := range []struct{ name, value string }{
 		{"number", *number},
 		{"amount", *amount},
-		{"subject", *subject},
 		{"recipient", *recipient},
 		{"reason", *reason},
 		{"signature", *signature},
-		{"output", *output},
 	} {
 		if f.value == "" {
 			missing = append(missing, "--"+f.name)
@@ -85,7 +83,11 @@ func run() error {
 		return err
 	}
 
-	if err := os.WriteFile(*output, pdfBytes, 0o644); err != nil {
+	outPath := *output
+	if outPath == "" {
+		outPath = defaultOutputPath(dateVal, *number)
+	}
+	if err := os.WriteFile(outPath, pdfBytes, 0o644); err != nil {
 		return fmt.Errorf("writing output file: %w", err)
 	}
 	return nil
@@ -106,15 +108,24 @@ func parseAmount(s string) (float64, error) {
 	return v, nil
 }
 
-// parseDate parses DD.MM.YYYY; an empty string yields the zero time, which
-// makes the library default to the current date.
+// parseDate parses YYYY-MM-DD (ISO format); an empty string yields the zero
+// time, which makes the library default to the current date.
 func parseDate(s string) (time.Time, error) {
 	if s == "" {
 		return time.Time{}, nil
 	}
-	t, err := time.Parse("02.01.2006", s)
+	t, err := time.Parse("2006-01-02", s)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("invalid date %q: expected format DD.MM.YYYY", s)
+		return time.Time{}, fmt.Errorf("invalid date %q: expected format YYYY-MM-DD", s)
 	}
 	return t, nil
+}
+
+// defaultOutputPath builds "./<date> Eigenbeleg <number>.pdf" with the date
+// as YYYY-MM-DD, falling back to today when no date was given.
+func defaultOutputPath(date time.Time, number string) string {
+	if date.IsZero() {
+		date = time.Now()
+	}
+	return fmt.Sprintf("%s Eigenbeleg %s.pdf", date.Format("2006-01-02"), number)
 }

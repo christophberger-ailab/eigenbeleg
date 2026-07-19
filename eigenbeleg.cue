@@ -12,8 +12,9 @@ package eigenbeleg
 	// with an optional Euro suffix.
 	amount!: string & =~"^-?([0-9]{1,3}(\\.[0-9]{3})*,[0-9]+|[0-9]+(\\.[0-9]+)?)\\s*€?$"
 
-	// subject of the transaction (required)
-	subject!: string & !=""
+	// subject of the transaction (default: Privatentnahme or
+	// Privateinlage, chosen by the sign of amount)
+	subject?: string
 
 	// recipient of the payment (required)
 	recipient!: string & !=""
@@ -25,8 +26,8 @@ package eigenbeleg
 	// reason for the Eigenbeleg (required)
 	reason!: string & !=""
 
-	// date as DD.MM.YYYY (default: today)
-	date?: string & =~"^[0-9]{2}\\.[0-9]{2}\\.[0-9]{4}$"
+	// date as YYYY-MM-DD (default: today)
+	date?: string & =~"^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
 
 	// path to signature image, PNG or JPEG (required)
 	signature!: string & =~"(?i)\\.(png|jpe?g)$"
@@ -34,6 +35,7 @@ package eigenbeleg
 	// path to header image, PNG or JPEG
 	header?: string & =~"(?i)\\.(png|jpe?g)$"
 
-	// path of the PDF file to write (required)
-	output!: string & =~"(?i)\\.pdf$"
+	// path of the PDF file to write
+	// (default: ./<date> Eigenbeleg <number>.pdf)
+	output?: string & =~"(?i)\\.pdf$"
 }

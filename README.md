@@ -59,14 +59,14 @@ config file locations and precedence.
 | ------------------ | ----- | ----------------------- | -------- | ---------------------------------------------------------------------- |
 | `--number`         | `-n`  | `EIGENBELEG_NUMBER`     | yes      | Receipt number                                                        |
 | `--amount`         | `-a`  | `EIGENBELEG_AMOUNT`     | yes      | Amount, e.g. `1.234,56` or `-42.50`; negative for expenses             |
-| `--subject`        | `-s`  | `EIGENBELEG_SUBJECT`    | yes      | Subject of the transaction                                             |
+| `--subject`        | `-s`  | `EIGENBELEG_SUBJECT`    | no       | Subject of the transaction (default: `Privatentnahme` or `Privateinlage`) |
 | `--recipient`      | `-r`  | `EIGENBELEG_RECIPIENT`  | yes      | Recipient of the payment                                               |
 | `--type`           | `-t`  | `EIGENBELEG_TYPE`       | no       | Type of expenditure (default: `Privatentnahme` or `Privateinlage`)      |
 | `--reason`         | `-g`  | `EIGENBELEG_REASON`     | yes      | Reason for the Eigenbeleg                                              |
-| `--date`           | `-d`  | `EIGENBELEG_DATE`       | no       | Date as `DD.MM.YYYY` (default: today)                                  |
+| `--date`           | `-d`  | `EIGENBELEG_DATE`       | no       | Date as `YYYY-MM-DD` (default: today)                                  |
 | `--signature`      | `-i`  | `EIGENBELEG_SIGNATURE`  | yes      | Path to signature image, PNG or JPEG                                    |
 | `--header`         | `-H`  | `EIGENBELEG_HEADER`     | no       | Path to header image, PNG or JPEG                                      |
-| `--output`         | `-o`  | `EIGENBELEG_OUTPUT`     | yes      | Path of the PDF file to write                                          |
+| `--output`         | `-o`  | `EIGENBELEG_OUTPUT`     | no       | Path of the PDF file to write (default: `./<date> Eigenbeleg <number>.pdf`) |
 
 ### Example
 
@@ -77,6 +77,9 @@ eigenbeleg \
   --subject "Parkgebühren" \
   --recipient "Parkhaus Musterstadt" \
   --reason "Kein Beleg erhalten" \
-  --signature signature.png \
-  --output eigenbeleg.pdf
+  --signature signature.png
 ```
+
+This writes the PDF to `./<date> Eigenbeleg <number>.pdf` (e.g.
+`2026-001` on 2026-07-19 yields `2026-07-19 Eigenbeleg 2026-001.pdf`);
+pass `--output` to choose a different path.
