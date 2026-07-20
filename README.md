@@ -55,6 +55,9 @@ entries in a config file — see the
 [`start`](https://github.com/christophberger/start) package for details on
 config file locations and precedence.
 
+Running `eigenbeleg` without any arguments prints the usage, same as
+`eigenbeleg --help`.
+
 | Flag              | Short | Env var                | Required | Description                                                          |
 | ------------------ | ----- | ----------------------- | -------- | ---------------------------------------------------------------------- |
 | `--number`         | `-n`  | `EIGENBELEG_NUMBER`     | yes      | Receipt number                                                        |

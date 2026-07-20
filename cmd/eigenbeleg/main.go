@@ -32,8 +32,11 @@ var (
 	output    = flag.StringP("output", "o", "", "path of the PDF file to write (default: ./<date> Eigenbeleg <number>.pdf)")
 )
 
+const description = "Generate an Eigenbeleg (self-made receipt) PDF."
+
 func main() {
-	start.SetDescription("Generate an Eigenbeleg (self-made receipt) PDF.")
+	start.SetDescription(description)
+	flag.Usage = func() { printUsage(os.Stdout) }
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
@@ -41,6 +44,11 @@ func main() {
 }
 
 func run() error {
+	if len(os.Args) < 2 {
+		flag.Usage()
+		return nil
+	}
+
 	if err := start.Parse(); err != nil {
 		return err
 	}
@@ -109,6 +117,16 @@ func run() error {
 		return fmt.Errorf("writing output file: %w", err)
 	}
 	return nil
+}
+
+// printUsage prints the tool description and the flag list. It backs
+// flag.Usage, so pflag invokes it for --help, and run() invokes it when the
+// tool is called without any arguments.
+func printUsage(w io.Writer) {
+	fmt.Fprintln(w, description)
+	fmt.Fprintln(w)
+	fmt.Fprintf(w, "Usage of %s:\n", os.Args[0])
+	fmt.Fprint(w, flag.CommandLine.FlagUsages())
 }
 
 // printFields lists the receipt fields with inputs and defaults filled in,

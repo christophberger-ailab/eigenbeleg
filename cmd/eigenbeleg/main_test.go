@@ -70,6 +70,17 @@ func TestParseDate(t *testing.T) {
 	})
 }
 
+func TestPrintUsage(t *testing.T) {
+	var out strings.Builder
+	printUsage(&out)
+	got := out.String()
+	for _, want := range []string{description, "Usage of", "--amount", "-i, --signature"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("printUsage() output missing %q; got:\n%s", want, got)
+		}
+	}
+}
+
 func TestConfirm(t *testing.T) {
 	tests := []struct {
 		name  string
