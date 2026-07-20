@@ -80,6 +80,10 @@ eigenbeleg \
   --signature signature.png
 ```
 
+After validating the input, the tool lists all fields with inputs and
+defaults filled in and asks for confirmation before generating the PDF;
+press Enter (or answer `y`) to proceed.
+
 This writes the PDF to `./<date> Eigenbeleg <number>.pdf` (e.g.
 `2026-001` on 2026-07-19 yields `2026-07-19 Eigenbeleg 2026-001.pdf`);
 pass `--output` to choose a different path.

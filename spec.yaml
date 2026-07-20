@@ -36,6 +36,7 @@ components:
         2: Verify the input, exit with an error if input is missing or doesn't evaluate to the expected format (esp. amount and date)
         3: Call the library with the verified input
         4: Write the output to the given output path
+        5: If the tool is called without any arguments, print out the usage, just like `eigenbeleg --help`
 
 constraints:
     CONTENT:
@@ -58,4 +59,5 @@ constraints:
         3: Use https://github.com/christophberger/start to collect the input for the library and the path to the output file as flags, env vars, or from a config file
         4: Images can be png or jpeg
         5: The output path defaults to `./<date> Eigenbeleg <number>.pdf`, where <date> is the date input value as YYYY-MM-DD and <number> is the number input value
+        6: After validating the input, print out the fields filled out with inputs and defaults and have the user confirm to proceed. 
 

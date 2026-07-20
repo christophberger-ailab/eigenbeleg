@@ -6,7 +6,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -68,7 +70,7 @@ func run() error {
 		return err
 	}
 
-	pdfBytes, err := eigenbeleg.Generate(eigenbeleg.Receipt{
+	receipt := eigenbeleg.Receipt{
 		Number:        *number,
 		Amount:        amountVal,
 		Subject:       *subject,
@@ -78,19 +80,77 @@ func run() error {
 		Date:          dateVal,
 		SignaturePath: *signature,
 		HeaderPath:    *header,
-	})
-	if err != nil {
+	}
+	if err := receipt.Validate(); err != nil {
 		return err
 	}
 
 	outPath := *output
 	if outPath == "" {
-		outPath = defaultOutputPath(dateVal, *number)
+		outPath = defaultOutputPath(receipt.Date, receipt.Number)
 	}
+
+	printFields(os.Stdout, receipt, outPath)
+	ok, err := confirm(os.Stdin, os.Stdout)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		fmt.Println("Aborted.")
+		return nil
+	}
+
+	pdfBytes, err := eigenbeleg.Generate(receipt)
+	if err != nil {
+		return err
+	}
+
 	if err := os.WriteFile(outPath, pdfBytes, 0o644); err != nil {
 		return fmt.Errorf("writing output file: %w", err)
 	}
 	return nil
+}
+
+// printFields lists the receipt fields with inputs and defaults filled in,
+// plus the effective output path.
+func printFields(w io.Writer, r eigenbeleg.Receipt, outPath string) {
+	kind := "Einnahme"
+	if r.Amount < 0 {
+		kind = "Ausgabe"
+	}
+	headerPath := r.HeaderPath
+	if headerPath == "" {
+		headerPath = "(none)"
+	}
+	for _, f := range []struct{ name, value string }{
+		{"number", r.Number},
+		{"amount", eigenbeleg.FormatAmount(r.Amount) + " (" + kind + ")"},
+		{"subject", r.Subject},
+		{"recipient", r.Recipient},
+		{"type", r.Type},
+		{"reason", r.Reason},
+		{"date", r.Date.Format("2006-01-02")},
+		{"signature", r.SignaturePath},
+		{"header", headerPath},
+		{"output", outPath},
+	} {
+		fmt.Fprintf(w, "%-10s %s\n", f.name+":", f.value)
+	}
+}
+
+// confirm prompts on out and reads a single line from in. An empty line
+// (just Enter, or end of input) or a "y"/"yes" answer confirms.
+func confirm(in io.Reader, out io.Writer) (bool, error) {
+	fmt.Fprint(out, "Generate PDF? [Y/n] ")
+	line, err := bufio.NewReader(in).ReadString('\n')
+	if err != nil && err != io.EOF {
+		return false, fmt.Errorf("reading confirmation: %w", err)
+	}
+	switch strings.ToLower(strings.TrimSpace(line)) {
+	case "", "y", "yes":
+		return true, nil
+	}
+	return false, nil
 }
 
 // parseAmount accepts German notation (1.234,56) as well as plain decimal

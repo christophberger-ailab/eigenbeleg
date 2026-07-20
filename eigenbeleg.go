@@ -60,6 +60,14 @@ const (
 	sigMaxHeight = 20.0
 )
 
+// Validate checks the mandatory fields and applies the defaults for
+// Subject, Type, and Date, modifying r in place. Generate validates on its
+// own; calling Validate beforehand lets callers inspect the effective field
+// values, e.g. to show them to the user.
+func (r *Receipt) Validate() error {
+	return validate(r)
+}
+
 // Generate renders the receipt as an A4 PDF and returns the PDF bytes.
 func Generate(r Receipt) ([]byte, error) {
 	if err := validate(&r); err != nil {
