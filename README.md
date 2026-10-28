@@ -97,7 +97,7 @@ pass `--output` to choose a different path.
 eigenbeleg web --signature signature.png
 ```
 
-starts a local web UI at <http://localhost:8080/>. It lists all saved
+starts a local web UI at <http://localhost:12345/>. It lists all saved
 Eigenbelege in chronological order on the left (the newest stay in view),
 and shows the selected one in an edit form. From there you can create a new
 Eigenbeleg, save changes, and download the PDF. An Eigenbeleg created by
@@ -106,7 +106,7 @@ shown and restored via "Ausgeblendete anzeigen".
 
 | Flag          | Env var             | Default             | Description                                              |
 | ------------- | ------------------- | ------------------- | -------------------------------------------------------- |
-| `--addr`      | `EIGENBELEG_ADDR`   | `localhost:8080`    | Address to listen on                                     |
+| `--addr`      | `EIGENBELEG_ADDR`   | `localhost:12345`    | Address to listen on                                     |
 | `--store`     | `EIGENBELEG_STORE`  | `eigenbelege.json`  | JSON file that stores the Eigenbelege                    |
 | `--signature` |                     |                     | Default signature image path for new Eigenbelege         |
 | `--header`    |                     |                     | Default header image path for new Eigenbelege            |

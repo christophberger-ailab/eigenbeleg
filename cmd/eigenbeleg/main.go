@@ -35,7 +35,7 @@ var (
 	output    = flag.StringP("output", "o", "", "path of the PDF file to write (default: ./<date> Eigenbeleg <number>.pdf)")
 
 	// Flags for the web subcommand.
-	addr      = flag.String("addr", "localhost:8080", "web: address to listen on")
+	addr      = flag.String("addr", "localhost:12345", "web: address to listen on")
 	storePath = flag.String("store", "eigenbelege.json", "web: path of the JSON file that stores the Eigenbelege")
 )
 
