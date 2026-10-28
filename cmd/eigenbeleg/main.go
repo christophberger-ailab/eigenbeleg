@@ -1,5 +1,8 @@
 // Command eigenbeleg generates an Eigenbeleg (self-made receipt) PDF.
 //
+// "eigenbeleg web" starts a local web UI for creating, editing, and
+// printing Eigenbelege instead.
+//
 // All settings can be given as command line flags, environment variables
 // (EIGENBELEG_<FLAGNAME>), or entries in a config file (see the start
 // package for details).
@@ -30,6 +33,10 @@ var (
 	signature = flag.StringP("signature", "i", "", "path to signature image, PNG or JPEG (required)")
 	header    = flag.StringP("header", "H", "", "path to header image, PNG or JPEG")
 	output    = flag.StringP("output", "o", "", "path of the PDF file to write (default: ./<date> Eigenbeleg <number>.pdf)")
+
+	// Flags for the web subcommand.
+	addr      = flag.String("addr", "localhost:8080", "web: address to listen on")
+	storePath = flag.String("store", "eigenbelege.json", "web: path of the JSON file that stores the Eigenbelege")
 )
 
 const description = "Generate an Eigenbeleg (self-made receipt) PDF."
@@ -51,6 +58,10 @@ func run() error {
 
 	if err := start.Parse(); err != nil {
 		return err
+	}
+
+	if flag.Arg(0) == "web" {
+		return runWeb(*addr, *storePath)
 	}
 
 	var missing []string
@@ -126,6 +137,8 @@ func printUsage(w io.Writer) {
 	fmt.Fprintln(w, description)
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "Usage of %s:\n", os.Args[0])
+	fmt.Fprintf(w, "  %s [flags]       generate a PDF from the flags\n", os.Args[0])
+	fmt.Fprintf(w, "  %s web [flags]   start the web UI (uses --addr, --store, and --signature/--header as defaults)\n\n", os.Args[0])
 	fmt.Fprint(w, flag.CommandLine.FlagUsages())
 }
 

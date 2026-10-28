@@ -90,3 +90,27 @@ press Enter (or answer `y`) to proceed.
 This writes the PDF to `./<date> Eigenbeleg <number>.pdf` (e.g.
 `2026-001` on 2026-07-19 yields `2026-07-19 Eigenbeleg 2026-001.pdf`);
 pass `--output` to choose a different path.
+
+## Web UI
+
+```sh
+eigenbeleg web --signature signature.png
+```
+
+starts a local web UI at <http://localhost:8080/>. It lists all saved
+Eigenbelege in chronological order on the left (the newest stay in view),
+and shows the selected one in an edit form. From there you can create a new
+Eigenbeleg, save changes, and download the PDF. An Eigenbeleg created by
+mistake can be hidden ("Ausblenden"); hidden ones stay in the store and can be
+shown and restored via "Ausgeblendete anzeigen".
+
+| Flag          | Env var             | Default             | Description                                              |
+| ------------- | ------------------- | ------------------- | -------------------------------------------------------- |
+| `--addr`      | `EIGENBELEG_ADDR`   | `localhost:8080`    | Address to listen on                                     |
+| `--store`     | `EIGENBELEG_STORE`  | `eigenbelege.json`  | JSON file that stores the Eigenbelege                    |
+| `--signature` |                     |                     | Default signature image path for new Eigenbelege         |
+| `--header`    |                     |                     | Default header image path for new Eigenbelege            |
+
+Image paths are read on the machine running `eigenbeleg web`, so keep the
+default listen address on localhost. The UI uses [Pico CSS](https://picocss.com)
+and [htmx](https://htmx.org), both embedded in the binary, so it works offline.

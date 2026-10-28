@@ -1,0 +1,60 @@
+{{define "main" -}}
+<article>
+	<header>
+		<h2>{{if .ID}}Eigenbeleg {{.Form.Number}}{{else}}Neuer Eigenbeleg{{end}}</h2>
+	</header>
+
+	{{- if .Notice}}
+	<p class="notice{{if .Errors}} error{{end}}" role="status">
+		{{.Notice}}
+		{{- if .UndoHide}}
+		<button type="button" class="outline secondary" hx-post="/receipts/{{.UndoHide}}/unhide">Rückgängig</button>
+		{{- end}}
+	</p>
+	{{- end}}
+
+	{{- if .Hidden}}
+	<p class="notice" role="status">
+		Dieser Eigenbeleg ist ausgeblendet.
+		<button type="button" class="outline secondary" hx-post="/receipts/{{.ID}}/unhide">Wiederherstellen</button>
+	</p>
+	{{- end}}
+
+	<form method="post" action="{{if .ID}}/receipts/{{.ID}}{{else}}/receipts{{end}}"
+		hx-post="{{if .ID}}/receipts/{{.ID}}{{else}}/receipts{{end}}">
+		<div class="grid">
+			{{template "field" (field "number" "Nr." .Form.Number "" .Errors true)}}
+			{{template "field" (field "date" "Datum" .Form.Date "" .Errors false)}}
+		</div>
+		{{template "field" (field "amount" "Betrag in € (negativ für Ausgaben)" .Form.Amount "z.B. -42,50 oder 1.234,56" .Errors true)}}
+		{{template "field" (field "subject" "Vorgang" .Form.Subject "Standard: Privatentnahme bzw. Privateinlage" .Errors false)}}
+		{{template "field" (field "recipient" "Empfänger" .Form.Recipient "" .Errors true)}}
+		{{template "field" (field "type" "Art der Aufwendung" .Form.Type "Standard: Privatentnahme bzw. Privateinlage" .Errors false)}}
+		{{template "field" (field "reason" "Grund des Eigenbelegs" .Form.Reason "" .Errors true)}}
+		<div class="grid">
+			{{template "field" (field "signature" "Unterschrift (Pfad zu PNG/JPEG)" .Form.Signature "" .Errors true)}}
+			{{template "field" (field "header" "Kopfbild (Pfad zu PNG/JPEG, optional)" .Form.Header "" .Errors false)}}
+		</div>
+
+		<div class="actions">
+			<button type="submit" name="action" value="save">Speichern</button>
+			<button type="submit" name="action" value="pdf" class="secondary">Speichern &amp; PDF erzeugen</button>
+			{{- if and .ID (not .Hidden)}}
+			<button type="button" class="outline contrast hide" hx-post="/receipts/{{.ID}}/hide">Ausblenden</button>
+			{{- end}}
+		</div>
+	</form>
+</article>
+{{- end}}
+
+{{define "field" -}}
+<label>
+	{{.Label}}
+	{{- if eq .Name "reason"}}
+	<textarea name="{{.Name}}" rows="2"{{if .Required}} required{{end}}{{if .Error}} aria-invalid="true"{{end}}>{{.Value}}</textarea>
+	{{- else}}
+	<input name="{{.Name}}" value="{{.Value}}"{{if eq .Name "date"}} type="date"{{end}}{{if .Placeholder}} placeholder="{{.Placeholder}}"{{end}}{{if .Required}} required{{end}}{{if .Error}} aria-invalid="true"{{end}}>
+	{{- end}}
+	{{- if .Error}}<small>{{.Error}}</small>{{end}}
+</label>
+{{- end}}
