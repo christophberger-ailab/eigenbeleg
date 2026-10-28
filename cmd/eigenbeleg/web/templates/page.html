@@ -1,0 +1,51 @@
+{{define "page" -}}
+<!doctype html>
+<html lang="de">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Eigenbelege</title>
+	<link rel="stylesheet" href="/static/pico.min.css">
+	<link rel="stylesheet" href="/static/app.css">
+	<script src="/static/htmx.min.js"></script>
+	<script src="/static/app.js" defer></script>
+</head>
+<body hx-target="#main" hx-swap="innerHTML scroll:top">
+	<div class="app">
+		<aside>
+			<header>
+				<h1>Eigenbelege</h1>
+				<a href="/new" role="button" hx-get="/new" hx-push-url="true">+ Neuer Eigenbeleg</a>
+				<label><input type="checkbox" id="show-hidden" role="switch"> Ausgeblendete anzeigen</label>
+			</header>
+			{{template "list" .}}
+		</aside>
+		<main id="main">
+			{{template "main" .Main}}
+		</main>
+	</div>
+</body>
+</html>
+{{- end}}
+
+{{/* fragment is the response to htmx requests: the main view, plus the list as an out-of-band swap so that it reflects the change and the selection. */}}
+{{define "fragment" -}}
+{{template "main" .Main}}
+{{template "list" .}}
+{{- end}}
+
+{{define "list" -}}
+<nav id="receipt-list" hx-swap-oob="true">
+	{{- if not .Records}}<p class="empty">Noch keine Eigenbelege.</p>{{end}}
+	<ul>
+		{{- range .Records}}
+		<li{{if .Hidden}} class="is-hidden"{{end}}>
+			<a href="/receipts/{{.ID}}" hx-get="/receipts/{{.ID}}" hx-push-url="true"{{if eq .ID $.Selected}} aria-current="page"{{end}}>
+				<span class="meta"><span>{{displayDate .Date}} · Nr. {{.Number}}</span><span class="amount{{if lt .Amount 0.0}} expense{{end}}">{{displayAmount .Amount}}</span></span>
+				<span class="recipient">{{.Recipient}}{{if .Hidden}} <small>(ausgeblendet)</small>{{end}}</span>
+			</a>
+		</li>
+		{{- end}}
+	</ul>
+</nav>
+{{- end}}
