@@ -12,6 +12,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 func newTestApp(t *testing.T) (*webApp, string) {
@@ -105,6 +106,23 @@ func TestWebCreateEditHide(t *testing.T) {
 	res = do(t, h, "GET", "/new", nil, true)
 	if !strings.Contains(res.Body.String(), `value="2026-002"`) {
 		t.Errorf("new form does not suggest number 2026-002:\n%s", res.Body)
+	}
+
+	// Copying shows an unsaved form with the fields of the original, the
+	// next number, and today's date.
+	res = do(t, h, "GET", "/receipts/1/copy", nil, true)
+	body := res.Body.String()
+	today := time.Now().Format("2006-01-02")
+	for _, want := range []string{"Neuer Eigenbeleg", "Kopie von Eigenbeleg 2026-001", `value="2026-002"`, `value="` + today + `"`, `value="Parkhaus Musterstadt"`, "Kein Beleg erhalten", `hx-post="/receipts"`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("copy form lacks %q:\n%s", want, body)
+		}
+	}
+	if n := len(app.store.list()); n != 1 {
+		t.Errorf("copying stored a record: %d records", n)
+	}
+	if res := do(t, h, "GET", "/receipts/99/copy", nil, false); res.Code != http.StatusNotFound {
+		t.Errorf("GET copy of unknown receipt = %d, want 404", res.Code)
 	}
 
 	// Saving with the PDF button updates the record and triggers the download.

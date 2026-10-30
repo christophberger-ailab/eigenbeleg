@@ -130,6 +130,17 @@ main article {
 	margin: 0 auto;
 }
 
+main article > header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+main article > header h2 {
+	margin: 0;
+}
+
 .notice {
 	display: flex;
 	align-items: center;
