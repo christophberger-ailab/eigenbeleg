@@ -101,6 +101,7 @@ func (a *webApp) routes() http.Handler {
 	mux.HandleFunc("POST /receipts", a.save)
 	mux.HandleFunc("GET /receipts/{id}", a.show)
 	mux.HandleFunc("POST /receipts/{id}", a.save)
+	mux.HandleFunc("GET /receipts/{id}/copy", a.copyForm)
 	mux.HandleFunc("GET /receipts/{id}/pdf", a.pdf)
 	mux.HandleFunc("POST /receipts/{id}/hide", a.hide)
 	mux.HandleFunc("POST /receipts/{id}/unhide", a.unhide)
@@ -126,6 +127,21 @@ func (a *webApp) show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.render(w, r, formView{ID: rec.ID, Hidden: rec.Hidden, Form: toForm(rec)})
+}
+
+// copyForm shows a new, not yet saved record with the fields of an existing
+// one, but with the next number and today's date.
+func (a *webApp) copyForm(w http.ResponseWriter, r *http.Request) {
+	rec, ok := a.record(w, r)
+	if !ok {
+		return
+	}
+	view := a.blankForm()
+	fd := toForm(rec)
+	fd.Number, fd.Date = view.Form.Number, view.Form.Date
+	view.Form = fd
+	view.Notice = fmt.Sprintf("Kopie von Eigenbeleg %s. Noch nicht gespeichert.", rec.Number)
+	a.render(w, r, view)
 }
 
 // save creates or updates a record from the submitted form. If the form was

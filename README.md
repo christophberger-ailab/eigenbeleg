@@ -100,7 +100,9 @@ eigenbeleg web --signature signature.png
 starts a local web UI at <http://localhost:12345/>. It lists all saved
 Eigenbelege in chronological order on the left (the newest stay in view),
 and shows the selected one in an edit form. From there you can create a new
-Eigenbeleg, save changes, and download the PDF. An Eigenbeleg created by
+Eigenbeleg, copy the selected one ("Kopieren": same fields, next number and
+today's date, not saved until you click "Speichern"), save changes, and
+download the PDF. An Eigenbeleg created by
 mistake can be hidden ("Ausblenden"); hidden ones stay in the store and can be
 shown and restored via "Ausgeblendete anzeigen".
 

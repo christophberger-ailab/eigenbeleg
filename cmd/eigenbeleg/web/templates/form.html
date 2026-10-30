@@ -2,6 +2,9 @@
 <article>
 	<header>
 		<h2>{{if .ID}}Eigenbeleg {{.Form.Number}}{{else}}Neuer Eigenbeleg{{end}}</h2>
+		{{- if .ID}}
+		<a href="/receipts/{{.ID}}/copy" role="button" class="outline secondary" hx-get="/receipts/{{.ID}}/copy" hx-push-url="true">Kopieren</a>
+		{{- end}}
 	</header>
 
 	{{- if .Notice}}
